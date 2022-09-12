@@ -119,7 +119,7 @@ void main()
     vec4 n = noised(vec3(pos));
     pos += 0.4*sin(u_Time*0.15)*cos(u_Time*0.1)*n;
     float zMove = fbm(vec3(pos))*(sin(u_Time*0.2));
-    pos -= vec4(0., 0., 0.3*zMove, 0.);
+    pos -= vec4(0., 0., 0.3*zMove, 0.); 
     vec4 floorPos = floor(pos);
     vec4 modelposition = u_Model * pos;   // Temporarily store the transformed vertex positions for use below
     
