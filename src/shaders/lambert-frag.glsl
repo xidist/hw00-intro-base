@@ -23,46 +23,81 @@ in vec4 fs_Pos;
 out vec4 out_Col; // This is the final output color that you will see on your
                   // screen for the pixel that is currently being processed.
 
-// vec4 noised(int x){
-//     float d = fract((x*1.)*3.1415);
-//     return vec4(d);
-// }
+//from https://www.shadertoy.com/view/XsXfRH
+float hash(vec3 p)  // replace this by something better
+{
+    p  = 50.0*fract( p*0.3183099 + vec3(0.71,0.113,0.419));
+    return -1.0+2.0*fract( p.x*p.y*p.z*(p.x+p.y+p.z) );
+}
 
-// vec4 fbm( vec3 x, int octaves )
-// {
-//     float f = 1.98;  // could be 2.0
-//     float s = 0.49;  // could be 0.5
-//     float a = 0.0;
-//     float b = 0.5;
-//     vec3  d = vec3(0.0);
-//     mat3  m = mat3(1.0,0.0,0.0,
-//     0.0,1.0,0.0,
-//     0.0,0.0,1.0);
-//     for( int i=0; i < octaves; i++ )
-//     {
-//         vec4 n = vec4(); //noised(x);
-//         a += b*n.x;          // accumulate values
-//         d += b*m*n.yzw;      // accumulate derivatives
-//         b *= s;
-//         x = f*m3*x;
-//         m = f*m3i*m;
-//     }
-//     return vec4( a, d, 1, 1 );
-// }
+
+// return value noise (in x) and its derivatives (in yzw)
+vec4 noised(vec3 x )
+{
+    vec3 i = floor(x);
+    vec3 w = fract(x);
+
+    // quintic interpolation
+    vec3 u = w*w*w*(w*(w*6.0-15.0)+10.0);
+    vec3 du = 30.0*w*w*(w*(w-2.0)+1.0);   
+    
+    float a = hash(i+vec3(0.0,0.0,0.0));
+    float b = hash(i+vec3(1.0,0.0,0.0));
+    float c = hash(i+vec3(0.0,1.0,0.0));
+    float d = hash(i+vec3(1.0,1.0,0.0));
+    float e = hash(i+vec3(0.0,0.0,1.0));
+	float f = hash(i+vec3(1.0,0.0,1.0));
+    float g = hash(i+vec3(0.0,1.0,1.0));
+    float h = hash(i+vec3(1.0,1.0,1.0));
+	
+    float k0 =   a;
+    float k1 =   b - a;
+    float k2 =   c - a;
+    float k3 =   e - a;
+    float k4 =   a - b - c + d;
+    float k5 =   a - c - e + g;
+    float k6 =   a - b - e + f;
+    float k7 = - a + b + c - d + e - f - g + h;
+
+    return vec4( k0 + k1*u.x + k2*u.y + k3*u.z + k4*u.x*u.y + k5*u.y*u.z + k6*u.z*u.x + k7*u.x*u.y*u.z, 
+                 du * vec3( k1 + k4*u.y + k6*u.z + k7*u.y*u.z,
+                            k2 + k5*u.z + k4*u.x + k7*u.z*u.x,
+                            k3 + k6*u.x + k5*u.y + k7*u.x*u.y ) );
+}
+
+#define OCTAVES 9
+float fbm (vec3 v) {
+    // Initial values
+    float value = 0.0;
+    float amplitude = .5;
+    float frequency = 0.;
+
+    // Loop of octaves
+    for (int i = 0; i < OCTAVES; i++) {
+        value += amplitude * abs(noised(v).x);
+        v *= 2.;
+        amplitude *= .5;
+    }
+    return value;
+}
 
 void main()
 {
     
     // Material base color (before shading)
         vec4 diffuseColor = u_Color;
-        //vec4 diffuseColor = fs_Pos;  
-        //float f = fbm(1, diffuseColor.x, diffuseColor.y, diffuseColor.z, 6);
-        //diffuseColor *= diffuseColor;
+        diffuseColor += fbm(vec3(fs_Pos));
+        diffuseColor += 0.3*fbm(vec3(fs_Pos)); //stacking fbm noise
+        vec4 _noised = noised(vec3(u_Color));
+        vec3 derivs = vec3(_noised.y, _noised.z, _noised.w);
+        diffuseColor += 0.35*fbm(vec3(derivs));
+        diffuseColor -= 0.15*fbm(vec3(derivs));
+
 
         // Calculate the diffuse term for Lambert shading
         float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));
         // Avoid negative lighting values
-        // diffuseTerm = clamp(diffuseTerm, 0, 1);
+        diffuseTerm = clamp(diffuseTerm, 0., 1.);
 
         float ambientTerm = 0.2;
 

@@ -27,6 +27,8 @@ let prevRed: number = 20;
 let prevGreen: number = 20;
 let prevBlue: number = 20;
 
+let time = 0;
+
 function loadScene() {
   icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, controls.tesselations);
   icosphere.create();
@@ -104,7 +106,9 @@ function main() {
       prevBlue = controls.blue;
       lambert.setGeometryColor(vec4.fromValues(controls.red/255., controls.green/255., controls.blue/255., 1));
     }
-    
+    //increase time
+    lambert.setTime(time);
+    time++;
     //lambert.setGeometryColor(vec4.fromValues(controls.red, controls.green, controls.blue, 1));
     renderer.render(camera, lambert, [
       //icosphere,
