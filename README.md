@@ -5,8 +5,10 @@ I combined [two](https://www.shadertoy.com/view/XsXfRH) [different](https://theb
 <img width="200" height="200" alt="rubyrose" src="https://user-images.githubusercontent.com/60904107/189792298-79d1beec-1c57-4e88-a378-92adcd848bd8.png">
   <img width="200" height="200" alt="sugarspice" src="https://user-images.githubusercontent.com/60904107/189792305-c92ffe63-033e-438e-b718-940fcf5c432a.png">
   <img width="200" height="200" alt="niceice" src="https://user-images.githubusercontent.com/60904107/189792312-8c571bbd-4013-404a-87e0-a93104ff217e.png">
+  <img width="200" height="200" alt="Screen Shot 2022-09-12 at 10 39 25 PM" src="https://user-images.githubusercontent.com/60904107/189795507-6c802058-7a3d-4726-8720-5bf9becc994b.png">
+
 </p>
-<p align="center">rubyrose, sugar, niceice</p>
+<p align="center">rubyrose, sugarspice, niceice, applcinnie</p>
 
 I used sin and cos functions with respect to time to jiggle the vertices of the cube
 
