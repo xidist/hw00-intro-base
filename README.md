@@ -15,8 +15,7 @@ I used sin and cos functions with respect to time to jiggle the vertices of the 
 </p>
 <p align="center">color shifting and vertex deformations</p>
 
-
-  
+[Link to live demo site](https://xidist.github.io/hw00-intro-base/)
   
 # ----------------HW Description Below-------------------------
 # HW 0: Intro to Javascript and WebGL
