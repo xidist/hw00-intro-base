@@ -78,7 +78,8 @@ function main() {
     new Shader(gl.VERTEX_SHADER, require('./shaders/lambert-vert.glsl')),
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/lambert-frag.glsl')),
   ]);
-
+  //init time
+  lambert.setTime(time);
   // This function will be called every frame
   function tick() {
     camera.update();
@@ -132,6 +133,8 @@ function main() {
   camera.updateProjectionMatrix();
 
   // Start the render loop
+  //init time
+  lambert.setTime(1);
   tick();
 }
 

@@ -92,6 +92,22 @@ float fbm (vec3 v) {
     return value;
 }
 
+float fbm2 (vec2 _st) {
+    float v = 0.0;
+    float a = 0.5;
+    vec2 shift = vec2(100.0);
+    // Rotate to reduce axial bias
+    mat2 rot = mat2(cos(0.5), sin(0.5),
+                    -sin(0.5), cos(0.50));
+    for (int i = 0; i < OCTAVES; ++i) {
+        vec4 _noised = noised(vec3(_st, 1.));
+        v += a * fbm(vec3(_noised));
+        _st = rot * _st * 2.0 + shift;
+        a *= 0.5;
+    }
+    return v;
+}
+
 
 void main()
 {
@@ -122,7 +138,7 @@ void main()
     pos -= vec4(0., 0., 0.3*zMove, 0.); 
     vec4 floorPos = floor(pos);
     vec4 modelposition = u_Model * pos;   // Temporarily store the transformed vertex positions for use below
-    
+
     fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies
     //fs_LightVec = -fs_LightVec
     gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is

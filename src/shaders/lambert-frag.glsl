@@ -74,11 +74,28 @@ float fbm (vec3 v) {
 
     // Loop of octaves
     for (int i = 0; i < OCTAVES; i++) {
-        value += amplitude * abs(noised(v).x);
+        value += amplitude * (1.1 - abs(noised(v).x))*(1.1 - abs(noised(v).x))*noised(vec3(0.4*fs_Col)).x;
         v *= 2.;
         amplitude *= .5;
     }
     return value;
+}
+
+
+float fbm2 (vec2 _st) {
+    float v = 0.0;
+    float a = 0.5;
+    vec2 shift = vec2(100.0);
+    // Rotate to reduce axial bias
+    mat2 rot = mat2(cos(0.5), sin(0.5),
+                    -sin(0.5), cos(0.50));
+    for (int i = 0; i < OCTAVES; ++i) {
+        vec4 _noised = noised(vec3(_st, 1.));
+        v += a * fbm(vec3(_noised));
+        _st = rot * _st * 2.0 + shift;
+        a *= 0.5;
+    }
+    return v;
 }
 
 void main()
@@ -93,6 +110,17 @@ void main()
         diffuseColor += 0.35*fbm(vec3(derivs));
         diffuseColor -= 0.15*fbm(vec3(derivs));
 
+        // //complimentary color
+        // vec4 comp = vec4(1.) - diffuseColor;
+        // comp += fbm2(vec2(fs_Pos.x, fs_Pos.y));
+        // diffuseColor +\
+        //COLOR ANIM
+    //complimentary color
+        vec4 comp = vec4(1.) - fs_Col;
+        comp += 0.7*fbm2(vec2(fs_Pos.x, fs_Pos.y))*0.3*fbm(vec3(fs_Pos));
+        //vs_Col = comp;
+       // fs_Col = vs_Col;
+       diffuseColor += 0.3*comp;
 
         // Calculate the diffuse term for Lambert shading
         float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));
